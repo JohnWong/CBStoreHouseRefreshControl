@@ -27,6 +27,8 @@
                           reverseLoadingAnimation:(BOOL)reverseLoadingAnimation
                           internalAnimationFactor:(CGFloat)internalAnimationFactor;
 
+- (void)scrollViewDidAppear;
+
 - (void)scrollViewDidScroll;
 
 - (void)scrollViewDidEndDragging;

@@ -10,7 +10,7 @@
 #import "BarItem.h"
 
 static const CGFloat kloadingIndividualAnimationTiming = 0.8;
-static const CGFloat kbarDarkAlpha = 0.4;
+static const CGFloat kbarDarkAlpha = 0.8;
 static const CGFloat kloadingTimingOffset = 0.1;
 static const CGFloat kdisappearDuration = 1.2;
 static const CGFloat krelativeHeightFactor = 2.f/5.f;
@@ -102,6 +102,8 @@ NSString *const yKey = @"y";
         if (startPoint.y > height) height = startPoint.y;
         if (endPoint.y > height) height = endPoint.y;
     }
+    width += lineWidth * 2;
+    height += lineWidth * 2;
     refreshControl.frame = CGRectMake(0, 0, width, height);
 
     // Create bar items
@@ -122,7 +124,6 @@ NSString *const yKey = @"y";
     }
     
     refreshControl.barItems = [NSArray arrayWithArray:mutableBarItems];
-    refreshControl.frame = CGRectMake(0, 0, width, height);
     refreshControl.center = CGPointMake([UIScreen mainScreen].bounds.size.width/2, 0);
     for (BarItem *barItem in refreshControl.barItems) {
         [barItem setupWithFrame:refreshControl.frame];
@@ -132,11 +133,14 @@ NSString *const yKey = @"y";
     return refreshControl;
 }
 
-#pragma mark UIScrollViewDelegate
-
-- (void)scrollViewDidScroll
+- (void)scrollViewDidAppear
 {
     if (self.originalTopContentInset == 0) self.originalTopContentInset = self.scrollView.contentInset.top;
+}
+
+#pragma mark UIScrollViewDelegate
+- (void)scrollViewDidScroll
+{
     self.center = CGPointMake([UIScreen mainScreen].bounds.size.width/2, self.realContentOffsetY*krelativeHeightFactor);
     if (self.state == CBStoreHouseRefreshControlStateIdle)
         [self updateBarItemsWithProgress:self.animationProgress];
