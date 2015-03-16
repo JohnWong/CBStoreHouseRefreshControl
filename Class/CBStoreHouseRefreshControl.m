@@ -269,25 +269,27 @@ NSString *const yKey = @"y";
 
 - (void)finishingLoading
 {
-    self.state = CBStoreHouseRefreshControlStateDisappearing;
-    UIEdgeInsets newInsets = self.scrollView.contentInset;
-    newInsets.top = self.originalTopContentInset;
-    [UIView animateWithDuration:kdisappearDuration animations:^(void) {
-        self.scrollView.contentInset = newInsets;
-    } completion:^(BOOL finished) {
-        self.state = CBStoreHouseRefreshControlStateIdle;
-        [self.displayLink invalidate];
+    if (self.state == CBStoreHouseRefreshControlStateRefreshing) {
+        self.state = CBStoreHouseRefreshControlStateDisappearing;
+        UIEdgeInsets newInsets = self.scrollView.contentInset;
+        newInsets.top = self.originalTopContentInset;
+        [UIView animateWithDuration:kdisappearDuration animations:^(void) {
+            self.scrollView.contentInset = newInsets;
+        } completion:^(BOOL finished) {
+            self.state = CBStoreHouseRefreshControlStateIdle;
+            [self.displayLink invalidate];
+            self.disappearProgress = 1;
+        }];
+        
+        for (BarItem *barItem in self.barItems) {
+            [barItem.layer removeAllAnimations];
+            barItem.alpha = kbarDarkAlpha;
+        }
+        
+        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateDisappearAnimation)];
+        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         self.disappearProgress = 1;
-    }];
-
-    for (BarItem *barItem in self.barItems) {
-        [barItem.layer removeAllAnimations];
-        barItem.alpha = kbarDarkAlpha;
     }
-    
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateDisappearAnimation)];
-    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-    self.disappearProgress = 1;
 }
 
 @end
